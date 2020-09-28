@@ -45,6 +45,8 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
         // 前后端分离情况下 处理逻辑...
         // 更新登录令牌 - 之后访问系统其它接口直接通过token认证用户权限...
         String token = PasswordUtils.encodePassword(System.currentTimeMillis() + securityUser.getCurrentUserInfo().getSalt(), securityUser.getCurrentUserInfo().getSalt());
+        //TODO 将token 以及用户信息存入缓存并设定失效时间
+
         User user = userMapper.selectByPrimaryKey(securityUser.getCurrentUserInfo().getId());
         user.setToken(token);
         userMapper.updateByPrimaryKey(user);

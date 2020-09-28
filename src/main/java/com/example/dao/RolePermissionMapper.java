@@ -14,4 +14,6 @@ public interface RolePermissionMapper {
     int insertSelective(RolePermission record);
 
     int batchInsert(@Param("list") List<RolePermission> list);
+
+    List<RolePermission> findByAll();
 }

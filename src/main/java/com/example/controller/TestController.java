@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dao.UserMapper;
 import com.example.domain.User;
+import com.example.service.RolePermissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,20 @@ public class TestController {
     @Autowired
     private UserMapper userService;
 
+    @Autowired
+    private RolePermissionService rolePermissionService;
+
     @ApiOperation(value = "根据ID查询图书名称")
     @RequestMapping(value = {"/findNameByUserID"}, method = RequestMethod.POST)
     public String findNameByUserID(@RequestBody Object vo) {
         User user = userService.selectByPrimaryKey(1072806377661009920L);
         return user.getNickname();
+    }
+
+    @ApiOperation(value = "test")
+    @RequestMapping(value = {"/test"}, method = RequestMethod.POST)
+    public String test(){
+        rolePermissionService.cacheRolePermissionInfo();
+        return "成功";
     }
 }

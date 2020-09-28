@@ -6,6 +6,18 @@ spring:
     url: jdbc:mysql://119.45.177.114:3306/test?useUnicode=true&characterEncoding=utf-8
     username: root
     password: lr123456
+  redis:
+    host: 119.45.177.114
+    port: 6379
+    database: 0
+    password:
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+    timeout: 0
 #security:
 #  basic:
 #    enabled=false:
@@ -14,3 +26,5 @@ spring:
 logging:
   level:
     root: DEBUG
+security:
+  anonymousURL: -/login,/index,/test/test

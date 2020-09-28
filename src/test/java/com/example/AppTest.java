@@ -1,8 +1,7 @@
 package com.example;
 
 
-import com.example.dao.UserMapper;
-import com.example.domain.User;
+import com.example.service.RolePermissionService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,11 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class AppTest {
 
     @Autowired
-    private UserMapper userMapper;
+    private RolePermissionService rolePermissionService;
 
     @Test
     public void test() {
-        User user = userMapper.selectByPrimaryKey(new Long("1072806377661009920"));
-        System.out.println(user.getNickname());
+        rolePermissionService.cacheRolePermissionInfo();
     }
 }
