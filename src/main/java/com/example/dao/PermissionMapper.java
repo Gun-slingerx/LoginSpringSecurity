@@ -19,4 +19,6 @@ public interface PermissionMapper {
     int updateByPrimaryKey(Permission record);
 
     int batchInsert(@Param("list") List<Permission> list);
+
+
 }

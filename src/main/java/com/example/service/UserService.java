@@ -1,13 +1,11 @@
 package com.example.service;
 
-import com.example.domain.User;
-import org.apache.ibatis.annotations.Param;
 
+import com.example.domain.User;
 import java.util.List;
 
 public interface UserService {
 
-    //
 
     int deleteByPrimaryKey(Long id);
 
@@ -21,8 +19,11 @@ public interface UserService {
 
     int updateByPrimaryKey(User record);
 
-    int batchInsert(@Param("list") List<User> list);
+    int batchInsert(List<User> list);
 
-    List<User> findByUsername(@Param("username")String username);
+    //根据用户名获取用户信息
+    List<User> findByUsername(String username);
 
+    //获取用户权限ID列表
+    List<Long> getUserPermission(Long userId);
 }

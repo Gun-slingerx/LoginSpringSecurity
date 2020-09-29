@@ -17,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 /**
  * 1. 用户发起表单请求后，首先进入UsernamePasswordAuthenticationFilter
  * 2.在 UsernamePasswordAuthenticationFilter 中根据用户输入的用户名、密码构建了 UsernamePasswordAuthenticationToken，
@@ -63,4 +64,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         return new SecurityUser(user);
     }
+
+
+    /**
+     * 根据ID获取用户信息
+     */
+    public SecurityUser getSecurityUserByUserId(Long userId) {
+        User user = userMapper.selectByPrimaryKey(userId);
+        return user != null ? new SecurityUser() : null;
+    }
+
+
 }
