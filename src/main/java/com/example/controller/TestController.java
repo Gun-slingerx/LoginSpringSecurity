@@ -35,4 +35,10 @@ public class TestController {
         rolePermissionService.cacheRolePermissionInfo();
         return "成功";
     }
+
+    @ApiOperation(value = "test2")
+    @RequestMapping(value = {"/test2"}, method = RequestMethod.POST)
+    public String test2(){
+        return "这是test2";
+    }
 }

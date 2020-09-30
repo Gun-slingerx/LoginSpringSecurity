@@ -5,6 +5,7 @@ import com.example.dao.UserRoleMapper;
 import com.example.domain.SecurityUser;
 import com.example.domain.User;
 import com.example.domain.UserRole;
+import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,43 +35,34 @@ import java.util.List;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
 
     @Autowired
     private UserRoleMapper userRoleMapper;
 
 
+    /**
+     * 在springSecurity中角色和权限是一回事，仅仅使用一段字符串代表权限信息，这里使用
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //查询用户
-        List<User> userList = userMapper.findByUsername(username);
+        List<User> userList = userService.findByUsername(username);
         if (CollectionUtils.isEmpty(userList)) {
-            throw new UsernameNotFoundException("User " + " was not found in db");
+            throw new UsernameNotFoundException("用户名不存在");
         }
         User user = userList.get(0);
         Long user_id = user.getId();
-        //查询角色
-        List<UserRole> userRoleList = userRoleMapper.findByUserId(user_id);
-        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(userRoleList)) {
-            /**
-             * 在springSecurity中角色和权限是一回事，仅仅使用一段字符串代表权限信息，这里将用户拥有的权限id列表查询出来，并构成userRoleList
-             */
-            for (UserRole role : userRoleList) {
-                GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getRoleId().toString());
-                grantedAuthorities.add(grantedAuthority);
-            }
-
-        }
-        return new SecurityUser(user);
+        //根据用户ID获取权限信息
+        List<Long> permissionIds = userService.getUserPermission(user_id);
+        return new SecurityUser(user, permissionIds);
     }
-
 
     /**
      * 根据ID获取用户信息
      */
     public SecurityUser getSecurityUserByUserId(Long userId) {
-        User user = userMapper.selectByPrimaryKey(userId);
+        User user = userService.selectByPrimaryKey(userId);
         return user != null ? new SecurityUser() : null;
     }
 

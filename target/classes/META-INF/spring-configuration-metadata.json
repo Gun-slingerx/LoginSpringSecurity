@@ -1,0 +1,16 @@
+{
+  "groups": [
+    {
+      "name": "loginconfig",
+      "type": "com.example.config.MyProperties",
+      "sourceType": "com.example.config.MyProperties"
+    },
+    {
+      "name": "loginconfig.auth",
+      "type": "com.example.config.MyProperties$Auth",
+      "sourceType": "com.example.config.MyProperties"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}

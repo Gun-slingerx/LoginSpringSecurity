@@ -7,11 +7,15 @@ import com.example.service.impl.UserDetailsServiceImpl;
 import com.example.util.MultiReadHttpServletRequest;
 import com.example.util.MultiReadHttpServletResponse;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -50,13 +54,40 @@ public class MyAuthenticationFilter extends OncePerRequestFilter {
         MultiReadHttpServletRequest wrappedRequest = new MultiReadHttpServletRequest(request);
         MultiReadHttpServletResponse wrappedResponse = new MultiReadHttpServletResponse(response);
         StopWatch stopWatch = new StopWatch();
+        try {
+            stopWatch.start();
+            logRequestBody(wrappedRequest);
+            String jwtToken = wrappedRequest.getHeader(Constants.REQUEST_HEADER);
+            log.debug("后台检查令牌:{}", jwtToken);
+            if (StringUtils.isNotBlank(jwtToken)) {
+                // JWT相关start ===========================================
+                // 获取jwt中的信息
+                Claims claims = Jwts.parser().setSigningKey(Constants.SALT).parseClaimsJws(jwtToken.replace("Bearer", "")).getBody();
+                // 获取当前登录用户名
+                System.out.println("获取当前登录用户名: " + claims.getSubject());
+                // TODO 如需使用jwt特性在此做处理~
+                // JWT相关end ===========================================
 
-        stopWatch.start();
-        logRequestBody(wrappedRequest);
-        String token = wrappedRequest.getHeader(Constants.REQUEST_HEADER);
-        log.debug("后台检查令牌:{}", token);
-        if (StringUtils.isNotBlank(token)) {
-
+                String userName = claims.getSubject();
+                //通过用户名获取用户信息
+                SecurityUser securityUser = (SecurityUser) userDetailsService.loadUserByUsername(userName);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(securityUser, null, securityUser.getAuthorities());
+                // 全局注入角色权限信息和登录用户基本信息
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            filterChain.doFilter(wrappedRequest, wrappedResponse);
+        } catch (ExpiredJwtException e) {
+            // jwt令牌过期
+            SecurityContextHolder.clearContext();
+            this.authenticationEntryPoint.commence(wrappedRequest, response, null);
+        } catch (AuthenticationException e) {
+            SecurityContextHolder.clearContext();
+            this.authenticationEntryPoint.commence(wrappedRequest, response, e);
+        } finally {
+            stopWatch.stop();
+            long usedTimes = stopWatch.getTotalTimeMillis();
+            // 记录响应的消息体
+            logResponseBody(wrappedRequest, wrappedResponse, usedTimes);
         }
     }
 
